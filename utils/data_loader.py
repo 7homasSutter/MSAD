@@ -71,7 +71,8 @@ class DataLoader:
 					x.append(curr_data[:, 0])
 					y.append(curr_data[:, 1])
 					# Remove path from file name, keep dataset, time series name
-					fname = '/'.join(fname.split('/')[-2:])		
+					#fname = '/'.join(fname.split('/')[-2:])
+					fname = os.path.join(*fname.split(os.path.sep)[-2:])
 					fnames.append(fname.replace(self.data_path, ''))
 					
 		return x, y, fnames

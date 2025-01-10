@@ -71,7 +71,8 @@ class ScoresLoader:
 		idx_failed = []
 
 		for i, name in enumerate(tqdm(file_names, desc='Loading scores')):
-			name_split = name.split('/')[-2:]
+			#name_split = name.split('/')[-2:]
+			name_split = name.split(os.path.sep)[-2:]
 			paths = [os.path.join(self.scores_path, name_split[0], detector, 'score', name_split[1]) for detector in detectors]
 			data = []
 			try:
@@ -100,7 +101,8 @@ class ScoresLoader:
 		:param score: 1D arrays (as many as file names)
 		'''
 		for fname in file_names:
-			dataset, ts_name = fname.split('/')[-2:]
+			#dataset, ts_name = fname.split('/')[-2:]
+			dataset, ts_name = fname.split(os.path.sep)[-2:]
 			
 			Path(os.path.join(self.scores_path, dataset, detector))\
 			.mkdir(parents=True, exist_ok=True)

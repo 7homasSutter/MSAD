@@ -29,6 +29,8 @@ from utils.config import *
 from eval_deep_model import eval_deep_model
 
 
+
+
 def train_deep_model(
 	data_path,
 	model_name,
@@ -83,10 +85,12 @@ def train_deep_model(
 	
 	# Create the model, load it on GPU and print it
 	model = deep_models[model_name.lower()](**model_parameters).to(device)
-	classifier_name = f"{model_parameters_file.split('/')[-1].replace('.json', '')}_{window_size}"
+	#classifier_name = f"{model_parameters_file.split('/')[-1].replace('.json', '')}_{window_size}"
+	classifier_name = f"{os.path.basename(model_parameters_file).replace('.json', '')}_{window_size}"
 	if read_from_file is not None and "unsupervised" in read_from_file:
-		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
-	
+		#classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		classifier_name += f"_{os.path.basename(read_from_file).replace('unsupervised_', '')[:-len('.csv')]}"
+
 	# Create the executioner object
 	model_execute = ModelExecutioner(
 		model=model,
@@ -112,6 +116,8 @@ def train_deep_model(
 	# Save training stats
 	timestamp = datetime.now().strftime('%d%m%Y_%H%M%S')
 	df = pd.DataFrame.from_dict(results, columns=["training_stats"], orient="index")
+
+
 	df.to_csv(os.path.join(save_done_training, f"{classifier_name}_{timestamp}.csv"))
 
 	# Evaluate on test set or val set
@@ -145,6 +151,18 @@ if __name__ == "__main__":
 	parser.add_argument('-e', '--eval-true', action="store_true", help='whether to evaluate the model on test data after training')
 
 	args = parser.parse_args()
+
+
+	if not os.path.exists(args.path):
+		raise FileNotFoundError(f"Path {args.path} does not exist")
+	if not os.path.exists(args.file):
+		raise FileNotFoundError(f"File {args.file} does not exist")
+	if not os.path.exists(args.params):
+		raise FileNotFoundError(f"Path {args.params} does not exist")
+	if not os.path.exists(save_done_training):
+		os.makedirs(save_done_training)
+
+	print(f"Training model {args.model} with parameters from {args.params}. Using file {args.file} for splits.")
 	train_deep_model(
 		data_path=args.path,
 		split_per=args.split,

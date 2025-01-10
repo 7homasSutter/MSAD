@@ -16,13 +16,13 @@ from models.model.sit import SignalTransformer
 
 
 # Important paths
-TSB_data_path = "data/TSB/data/"
-TSB_metrics_path = "data/TSB/metrics/"
-TSB_scores_path = "data/TSB/scores/"
-TSB_acc_tables_path = "data/TSB/acc_tables/"
+TSB_data_path = ".\\data\\TSB\\data\\"
+TSB_metrics_path = ".\\data\\TSB\\metrics\\"
+TSB_scores_path = ".\\data\\TSB\\scores\\"
+TSB_acc_tables_path = ".\\data\\TSB\\acc_tables\\"
 
-save_done_training = 'results/done_training/'	# when a model is done training a csv with training info is saved here
-path_save_results = 'results/raw_predictions'	# when evaluating a model, the predictions will be saved here
+save_done_training = '.\\results\\done_training\\'	# when a model is done training a csv with training info is saved here
+path_save_results = '.\\results\\raw_predictions'	# when evaluating a model, the predictions will be saved here
 
 # Detector
 detector_names = [

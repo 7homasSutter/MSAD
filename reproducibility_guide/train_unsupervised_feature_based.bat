@@ -1,0 +1,19 @@
+@echo off
+
+REM Training KNN Classifier
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_0.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_1.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_2.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_3.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_4.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_5.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_6.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_7.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_8.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_9.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_10.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_11.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_12.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_13.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_14.csv --path_save=.\results\weights\unsupervised\
+python train_feature_based.py --path=.\data\TSB_1024\TSFRESH_TSB_1024.csv --classifier=knn --split_per=0.7 --file=.\experiments\unsupervised_splits\unsupervised_testsize_2_split_15.csv --path_save=.\results\weights\unsupervised\

@@ -98,7 +98,7 @@ def create_tmp_dataset(
 
 	# Save new dataset
 	for ts, label, fname in tqdm(zip(ts_list, labels, fnames), total=len(ts_list), desc='Save dataset'):
-		fname_split = fname.split('/')
+		fname_split = os.path.normpath(fname).split(os.sep)
 		dataset_name = fname_split[-2]
 		ts_name = fname_split[-1]
 		new_names = [ts_name + '.{}'.format(i) for i in range(len(ts))]

@@ -39,7 +39,8 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	window_size = int(re.search(r'\d+', data_path).group())
 	classifier_name = f"rocket_{window_size}"
 	if read_from_file is not None and "unsupervised" in read_from_file:
-		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		#classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		classifier_name += f"_{os.path.basename(read_from_file).replace('unsupervised_', '')[:-len('.csv')]}"
 	training_stats = {}
 
 	# Load the splits
@@ -162,6 +163,12 @@ if __name__ == "__main__":
 	parser.add_argument('-ps', '--path_save', type=str, help='path to save the trained classifier', default="results/weights")
 
 	args = parser.parse_args()
+
+	if not os.path.exists(save_done_training):
+		os.makedirs(save_done_training)
+
+	print(f"Training rocket on {args}")
+
 	run_rocket(
 		data_path=args.path,
 		split_per=args.split_per,

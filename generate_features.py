@@ -31,7 +31,8 @@ def generate_features(path):
 	window_size = int(re.search(r'\d+', path).group())
 
 	# Create name of new dataset
-	dataset_name = [x for x in path.split('/') if str(window_size) in x][0]
+	#dataset_name = [x for x in path.split('/') if str(window_size) in x][0]
+	dataset_name = [x for x in os.path.normpath(path).split(os.sep) if str(window_size) in x][0]
 	new_name = f"TSFRESH_{dataset_name}.csv"
 
 	# Load datasets

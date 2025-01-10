@@ -38,7 +38,8 @@ class MetricsLoader:
 			for fname in glob.glob(os.path.join(self.metrics_path, detector, '*.csv')):
 				result.append(fname)
 
-		result = [name.split('/')[-1].replace('.csv', '') for name in result]
+		#result = [name.split('/')[-1].replace('.csv', '') for name in result]
+		result = [os.path.basename(name).replace('.csv', '') for name in result]
 		result = Counter(result)
 		
 		# for elem in result:

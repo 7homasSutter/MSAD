@@ -42,17 +42,21 @@ def eval_feature_based(
 	window_size = int(re.search(r'\d+', str(data_path)).group())
 	classifier_name = f"{model_name}_{window_size}" if str(window_size) not in model_name else model_name
 	if read_from_file is not None and "unsupervised" in read_from_file:
-		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		#classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		classifier_name += f"_{os.path.basename(read_from_file).replace('unsupervised_', '')[:-len('.csv')]}"
 	all_preds = []
 	inf_time = []
 
-	# Load model 
+	# Load model
 	model = load_classifier(model_path)
 
 	# Read data (single csv file or directory with csvs)
+	if not os.path.exists(data_path):
+		raise FileNotFoundError(f"Path {data_path} does not exist")
 	data = pd.read_csv(data_path, index_col=0)
 	labels, data = data['label'], data.drop('label', axis=1)
 
+	print(f"Loaded data read_from_file {read_from_file}, data_path {data_path}")
 	# Load the splits
 	if read_from_file is not None:
 		_, val_set, test_set = create_splits(
@@ -64,14 +68,22 @@ def eval_feature_based(
 
 	# if fnames is not defined then predict everything
 	if fnames is None:
+		print("Predicting on all instances since fnames is None")
 		data_index = list(data.index)
 		fnames = list(set([tuple(x.rsplit('.', 1))[0] for x in data_index]))
+	print(f"Predicting on {len(fnames)} instances")
+
 
 	# Compute predictions and inference time
 	for fname in tqdm(fnames, desc='Computing', unit='files'):
 		# Load the data (already loaded just collecting them)
+		fname = fname.replace('\\', '/')
 		x = data.filter(like=fname, axis=0)
 		y = labels.filter(like=fname, axis=0)
+
+		# Check if x is empty
+		if x.empty:
+			raise ValueError(f"Time series {fname} is empty")
 
 		# Predict time series
 		tic = perf_counter()
@@ -87,7 +99,7 @@ def eval_feature_based(
 	results.columns = [f"{classifier_name}_{x}" for x in results.columns.values]
 	
 	# Print results
-	print(results)
+	print(f"Results for {classifier_name}: {results}")
 
 	# Save the results
 	if path_save is not None:
@@ -115,5 +127,4 @@ if __name__ == "__main__":
 		model_path=args.model_path,
 		path_save=args.path_save,
 		read_from_file=args.file,
-
 	)

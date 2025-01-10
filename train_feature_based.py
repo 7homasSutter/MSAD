@@ -61,9 +61,15 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 	# Set up
 	window_size = int(re.search(r'\d+', data_path).group())
 	training_stats = {}
-	original_dataset = data_path.split('/')[:-1]
-	original_dataset = '/'.join(original_dataset)
-	
+
+	if "nt" in os.name:
+		original_dataset = data_path.split('\\')[:-1]
+		original_dataset = '\\'.join(original_dataset)
+	else:
+		original_dataset = data_path.split('/')[:-1]
+		original_dataset = '/'.join(original_dataset)
+
+	#print(f"Original dataset: {original_dataset}")
 	# Load the splits
 	train_set, val_set, test_set = create_splits(
 		original_dataset,
@@ -71,19 +77,32 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 		seed=seed,
 		read_from_file=read_from_file,
 	)
+	#print(f"Train set: {len(train_set)}")
 	train_indexes = [x[:-4] for x in train_set]
+	#print(f"train_indexes: {train_indexes}")
 	val_indexes = [x[:-4] for x in val_set]
 	test_indexes = [x[:-4] for x in test_set]
 
 	# Read tabular data
+	#print(f"Reading data from {data_path}")
 	data = pd.read_csv(data_path, index_col=0)
+	#print(f"Data shape: {data.shape} | {Counter(data['label'])} | {data.columns} | {data.index} | {data.head()}")
 
 	# Reindex them
 	data_index = list(data.index)
+	#print(f"data_index: {data_index}")
 	new_index = [tuple(x.rsplit('.', 1)) for x in data_index]
 	new_index = pd.MultiIndex.from_tuples(new_index, names=["name", "n_window"])
 	data.index = new_index
-	
+
+	# Normalize delimiters in data.index
+	data.index = data.index.set_levels([level.str.replace('/', '\\') for level in data.index.levels])
+
+	# Normalize delimiters in val_indexes and test_indexes
+	train_indexes = [x.replace('/', '\\') for x in train_indexes]
+	val_indexes = [x.replace('/', '\\') for x in val_indexes]
+	test_indexes = [x.replace('/', '\\') for x in test_indexes]
+
 	# Create subsets
 	training_data = data.loc[data.index.get_level_values("name").isin(train_indexes)]
 	val_data = data.loc[data.index.get_level_values("name").isin(val_indexes)]
@@ -91,8 +110,12 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 	
 	# Split data from labels
 	y_train, X_train = training_data['label'], training_data.drop('label', 1)
+	#print(f"X_train: {X_train} | y_train: {y_train}")
 	y_val, X_val = val_data['label'], val_data.drop('label', 1)
 	y_test, X_test = test_data['label'], test_data.drop('label', 1)
+
+	if X_train.shape[0] == 0:
+		raise ValueError("Training set is empty. Please check the data and splitting parameters.")
 
 	# Select the classifier
 	classifier = classifiers[classifier_name]
@@ -126,7 +149,8 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 	# Save training stats
 	classifier_name = f"{clf_name}_{window_size}"
 	if read_from_file is not None and "unsupervised" in read_from_file:
-		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		#classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		classifier_name += f"_{os.path.basename(read_from_file).replace('unsupervised_', '')[:-len('.csv')]}"
 	timestamp = datetime.now().strftime('%d%m%Y_%H%M%S')
 	df = pd.DataFrame.from_dict(training_stats, columns=["training_stats"], orient="index")
 	df.to_csv(os.path.join(save_done_training, f"{classifier_name}_{timestamp}.csv"))
@@ -167,6 +191,10 @@ if __name__ == "__main__":
 		clf_list = list(classifiers.keys())
 	else:
 		clf_list = [args.classifier]
+
+	if not os.path.exists(save_done_training):
+		os.makedirs(save_done_training)
+
 
 	for classifier in clf_list:
 		train_feature_based(

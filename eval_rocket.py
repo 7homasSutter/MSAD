@@ -33,9 +33,11 @@ def eval_rocket(data_path, model_path, path_save=None, fnames=None, read_from_fi
 	window_size = int(re.search(r'\d+', str(data_path)).group())
 	classifier_name = f"rocket_{window_size}"
 	if read_from_file is not None and "unsupervised" in read_from_file:
-		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		#classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		classifier_name += f"_{os.path.basename(read_from_file).replace('unsupervised_', '')[:-len('.csv')]}"
 	elif "testsize_" in model_path:
-		extra = model_path.split('/')[-2].replace(classifier_name, "")
+		#extra = model_path.split('/')[-2].replace(classifier_name, "")
+		extra = os.path.basename(os.path.dirname(model_path)).replace(classifier_name, "")
 		classifier_name += extra
 		
 	assert(
@@ -56,13 +58,17 @@ def eval_rocket(data_path, model_path, path_save=None, fnames=None, read_from_fi
 	else:
 		# Read data (single csv file or directory with csvs)
 		if '.csv' == data_path[-len('.csv'):]:
-			tmp_fnames = [data_path.split('/')[-1]]
-			data_path = data_path.split('/')[:-1]
-			data_path = '/'.join(data_path)
+			#tmp_fnames = [data_path.split('/')[-1]]
+			#data_path = data_path.split('/')[:-1]
+			#data_path = '/'.join(data_path)
+			tmp_fnames = [os.path.basename(data_path)]
+			data_path = os.path.dirname(data_path)
 		else:
 			tmp_fnames = read_files(data_path)
 
 		# Keep specific time series if fnames is given
+		tmp_fnames = [tmp_fname.replace('/', '\\') for tmp_fname in tmp_fnames]
+		fnames = [fname.replace('/', '\\') for fname in fnames]
 		if fnames is not None:
 			fnames_len = len(fnames)
 			fnames = [x for x in tmp_fnames if x in fnames]

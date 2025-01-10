@@ -34,9 +34,13 @@ def merge_scores(path, metric, save_path):
 	acc_tables.set_index(['dataset', 'filename'], inplace=True)
 	acc_tables.drop(columns=detector_names, inplace=True)
 
+	if acc_tables.empty:
+		raise ValueError(f"Accuracy table is empty. Please check the path {acc_tables_path}")
+
 	# Read detectors and oracles scores
 	metric_scores = metricsloader.read(metric.upper())
-	
+	metric_scores.index = metric_scores.index.str.replace('/', '\\')
+
 	# Read classifiers predictions, and add scores
 	df = None
 	scores_files = [x for x in os.listdir(path) if '.csv' in x]
@@ -44,10 +48,12 @@ def merge_scores(path, metric, save_path):
 		file_path = os.path.join(path, file)
 		current_classifier = pd.read_csv(file_path, index_col=0)
 		col_name = [x for x in current_classifier.columns if "class" in x][0]
-		
+		current_classifier.index = current_classifier.index.str.replace('/', '\\')
 		values = np.diag(metric_scores.loc[current_classifier.index, current_classifier.iloc[:, 0]])
 		curr_df = pd.DataFrame(values, index=current_classifier.index, columns=[col_name.replace("_class", "")])
 		curr_df = pd.merge(current_classifier[col_name], curr_df, left_index=True, right_index=True)
+		if curr_df.empty:
+			raise ValueError(f"Empty dataframe for {file_path}")
 		
 		if df is None:
 			df = curr_df
@@ -62,11 +68,16 @@ def merge_scores(path, metric, save_path):
 	# Add true labels from AUC_PR metrics
 	auc_pr_detectors_scores = metricsloader.read('AUC_PR')[detector_names]
 	labels = auc_pr_detectors_scores.idxmax(axis=1).to_frame(name='label')
+	labels.index = labels.index.str.replace('/', '\\')
+	print(f"labels: {labels}")
 	df = pd.merge(labels, df, left_index=True, right_index=True)
 	
 	# Change the indexes to dataset, filename
 	old_indexes = df.index.tolist()
-	old_indexes_split = [tuple(x.split('/')) for x in old_indexes]
+	print(f"old_indexes: {old_indexes}")
+	#old_indexes_split = [tuple(x.split('/')) for x in old_indexes]
+	old_indexes_split = [tuple(x.split(os.sep)) for x in old_indexes]
+	print(f"old_indexes_split: {old_indexes_split}")
 	filenames_df = pd.DataFrame(old_indexes_split, index=old_indexes, columns=['dataset', 'filename'])
 	df = pd.merge(df, filenames_df, left_index=True, right_index=True)
 	df = df.set_index(keys=['dataset', 'filename'])
@@ -83,7 +94,7 @@ def merge_scores(path, metric, save_path):
 
 
 def merge_inference_times(path, save_path):
-	detectors_inf_time_path = 'results/execution_time/detectors_inference_time.csv'
+	detectors_inf_time_path = 'results\\execution_time\\detectors_inference_time.csv'
 
 	# Read raw predictions of each model selector and fix indexing
 	selector_predictions = {}
@@ -91,8 +102,12 @@ def merge_inference_times(path, save_path):
 		if file_name.endswith('.csv'):
 			selector_name = file_name.replace("_preds.csv", "")
 			curr_df = pd.read_csv(os.path.join(path, file_name), index_col=0)
+
 			old_indexes = curr_df.index.tolist()
-			old_indexes_split = [tuple(x.split('/')) for x in old_indexes]
+			old_indexes = [x.replace('/', '\\') for x in old_indexes]
+			curr_df.index = old_indexes
+
+			old_indexes_split = [tuple(x.split('\\')) for x in old_indexes]
 			filenames_df = pd.DataFrame(old_indexes_split, index=old_indexes, columns=['dataset', 'filename'])
 			curr_df = pd.merge(curr_df, filenames_df, left_index=True, right_index=True)
 			curr_df = curr_df.set_index(keys=['dataset', 'filename'])

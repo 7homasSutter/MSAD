@@ -98,17 +98,24 @@ def eval_deep_model(
 			read_from_file=read_from_file,
 		)
 		fnames = test_set if len(test_set) > 0 else val_set
+
+	if os.name == 'nt':  # 'nt' indicates Windows
+		fnames = [x.replace('/', '\\') for x in fnames]
+
 	else:
 		# Read data (single csv file or directory with csvs)
 		if '.csv' == data_path[-len('.csv'):]:
-			tmp_fnames = [data_path.split('/')[-1]]
-			data_path = data_path.split('/')[:-1]
-			data_path = '/'.join(data_path)
+			#tmp_fnames = [data_path.split('/')[-1]]
+			#data_path = data_path.split('/')[:-1]
+			#data_path = '/'.join(data_path)
+			tmp_fnames = [os.path.basename(data_path)]
+			data_path = os.path.dirname(data_path)
 		else:
 			tmp_fnames = read_files(data_path)
 
 		# Keep specific time series if fnames is given
 		if fnames is not None:
+			print(f"fnames: {fnames}")
 			fnames_len = len(fnames)
 			fnames = [x for x in tmp_fnames if x in fnames]
 			if len(fnames) != fnames_len:
@@ -131,9 +138,11 @@ def eval_deep_model(
 			model_name = "sit_stem"
 	classifier_name = f"{model_name}_{window_size}"
 	if read_from_file is not None and "unsupervised" in read_from_file:
-		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		#classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+		classifier_name += f"_{os.path.basename(read_from_file).replace('unsupervised_', '')[:-len('.csv')]}"
 	elif "unsupervised" in path_save:
-		extra = model_path.split('/')[-2].replace(classifier_name, "")
+		extra = os.path.basename(os.path.dirname(model_path)).replace(classifier_name, "")
+		#extra = model_path.split('/')[-2].replace(classifier_name, "")
 		classifier_name += extra
 	
 	# Evaluate model
